@@ -21,7 +21,7 @@ str1(11) = 'P';
 disp(str1)
 
 % b) Start with a string containing It’s pouring with rain and replace the p with an r and the r with a p.
-str2 = 'It s pouring with rain';
+str2 = 'It''s pouring with rain'; % cute eh
 str2(6) = 'r';
 str2(19) = 'p';
 disp(str2)
@@ -35,9 +35,11 @@ str2(linspace(6,19,2)) = ['r' 'p']
 str = 'nosey little cook'
 
 % a) Create a vector called id1 so that when you type:
-id1 = [1 14];
-
-str(id1) = ['c' 'n']
+%id1 = [1 14];
+%str(id1) = ['c' 'n']
+% technically there was no e in cosey
+id1 = [14 2 3 5 6:13 1 2 2 17];
+str(id1)
 
 % you get:         cosy little nook
 % (Hint, write the phrase "nosey little cook" on a piece of paper and number each letter)
@@ -89,16 +91,18 @@ str(20:-1:1)
 
 % e) Demonstrate that the 6th, 13th and 17th letters in the reversed string are ‘pzx’.
 
-v1 = [6 13 17]
-
-str(v1)
+v1 = [6 13 17] % this isn't the reverse str!
+rev=str(20:-1:1)
+rev(v1)
 
 %% Q 2.5: Indexing into vectors
  
 % You ran an experiment where you took 20 measurements every 2.36 seconds starting 1.2 seconds into the experiment.
 % a) Create a vector that describes the moments in time that these measurements were taken.
 
-m = linspace(1.2,2.36,20)
+% m = linspace(1.2,2.36,20)
+%not quite, they should be 2.36 apart, not ending at 2.36
+m=1.2:2.36:1.2+(19*2.36)
 
 % b) When was the fifth measurement taken?
 
