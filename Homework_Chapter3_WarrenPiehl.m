@@ -27,7 +27,7 @@ mean(mean(vect))
 % b) Calculate the mean of the even numbers of vect.
 
 evenvect = [2:2:15];
-even = mean(mean(vect(evenvect)))
+even = mean(vect(evenvect))
 
 %% Q 3.7: Inner and Outer Products
 
