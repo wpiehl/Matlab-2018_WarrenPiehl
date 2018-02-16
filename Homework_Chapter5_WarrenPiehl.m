@@ -70,7 +70,7 @@ axis off; axis equal
 % 
 % 
 % 
-% % 5.2 Indexing into a linear array in real world co-ordinates
+%% 5.2 Indexing into a linear array in real world co-ordinates
 % Miguel collects data for an EEG experiment.  Each session of data consists of 30 trials, each lasing 5s. The EEG machine records data every 2ms. Strangely his data looks like a perfect sinusoid, with 0 mean normally distributed noise. 
 ntrials=30;
 durtrial=5*1000;
@@ -79,14 +79,18 @@ data=sin((2*pi* timevec)/(durtrial))+.1*randn(size(timevec));
 plot(timevec, data, '-')
 % 
 % a)  What is the mean response during all the data points that are within the first ½ second of every trial 
-
-vect = [1:500 5500:6000 11000:11500 16500:17000 22000:22500 27500:28000 ...
-    33000:33500 38500:39000 44000:44500 49500:50000 55000:55500 60500:61000 ...
-    66000:66500 71500:72000];
+vect=[];
+for t=1:2500:max(timevec)
+    vect=cat(2, vect, [1:500+((t-1)*5000)]);
+end
+% vect = [1:500 5500:6000 11000:11500 16500:17000 22000:22500 27500:28000 ...
+%     33000:33500 38500:39000 44000:44500 49500:50000 55000:55500 60500:61000 ...
+%     66000:66500 71500:72000];
 
 mean(data(vect))
 
 % b) What is the mean response during the interval 2-2.5s of each trial?
+% clever
 
 vect1 = vect+2000;
 
@@ -94,24 +98,25 @@ mean(data(vect1))
 
 % c) during which timepoints does the EEG response have values greater than 0.9?
 
-[X, Y] = ind2sub(size(data),data>.9);
+%[Y] = ind2sub(size(data),data>.9); % data is already a vector so you don't need to do this
 
-T = find(Y);
+T = timevec(find(data>.9));
 
 % d) during which timepoints does the EEG response have values between 0.7 and 0.8?
 % 
 [I, J] = ind2sub(size(data),0.7<=data>=.8);
 
-R = find(J);
+R = timevec(find(0.7<=data & data<=.8));
 
 % (obviously you will get different answers each time because your data will vary each time).
 
 
-% %  5.3 Indexing into a matrix using real world co-ordinates
+%% %  5.3 Indexing into a matrix using real world co-ordinates
 % Sam Lin collects data on 70 rats. 20 of them were duds and their data were thrown away. 
 % ratID=shuffle(1:70); ratID=sort(ratID(1:50)); 
 % 
-% On the remaining rats he collects 10000 trials, and he calculates the % correct across each bin of 100 trials.
+% On the remaining rats he collects 10000 trials, 
+% and he calculates the % correct across each bin of 100 trials.
 clear
 rat = 1:70;
 ratID = rat(randperm(length(rat))); ratID= sort(ratID(1:50)); 
@@ -126,17 +131,41 @@ colormap(gray)
 
 % b) change the colormap so that values above 90% are white and values below 10% are black.
 
-per(per>90)= 100; per(per<10)= 0;
+% this isn't changing the colormap
+
+% per(per>90)= 100; per(per<10)= 0;
+cmap=gray(100);
+cmap(1:10,:)= 0;
+cmap(91:100,:)= 1;
+colormap(cmap)
 
 % c) how many rats performed above 66% correct between trials 6001-7001?
 
 i = per(60:70);
-R = numel(i(i>65))
+i2=mean(i, 1); % otherwise you are often counting rats more than once
+R = find(i2>65) 
+length(R)
 
 % d) which rats were they?
 
-Rt = ind2sub(size(R),i(i>65))
+Rt = ratID(R); %(size(R),i(i>65))
 
 % e) How many trials would be needed for 40/50 rats to be performing above 80%.
+per80=per>80;
+numover80=sum(per80,2);
+minTover80=find(numover80>40);
+minTover80(1);
+binsteps(minTover80)
+
 % f) It turns out that for the rats with even ID numbers (2, 4, 6 10 etc.) the recording machine was on the blink for an interval between the 5678th trial and the 7533rd trial. Convert those numbers to NaN.
 % 
+badRats=find(mod(ratID,2)==0);
+per( 56:76, find(mod(ratID,2)==0))=NaN;
+
+figure(3)
+clf
+image(binsteps,size(ratID),per');
+colormap(gray(100));
+xlabel('Trial');
+ylabel('Rat');
+colorbar
