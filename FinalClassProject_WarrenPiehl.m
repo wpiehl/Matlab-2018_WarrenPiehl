@@ -11,7 +11,6 @@ close all
 %Number of subjects
 n = 60;
 
-
 %% weight of subjects in a vector: in kg/m^2
 m = [(24.5-18.9).*randn(n,1)+(18.9)]; %%average BMI
 m(m > 26) = 24.5;
@@ -23,7 +22,7 @@ g = 9.80665;
 %random acceleration generator
 A = [((-.10)-(-.09)).*randn(200,1)+(.09)]';
 % noise
-B = [((-.07)-(-.01)).*randn(200,1)+(-0.5)]';
+B = [((-.07)-(-.01)).*randn(60,200)+(-0.5)];
 
 % Time: 20s samples for each trial, 10Hz sampling rate
 timevect = linspace(0.1,20,200); 
@@ -40,31 +39,31 @@ Fy = (m*A)-B;
 Fz = m*g;
 
 % AP Momentum
-Mx = m.*Fx;
+Mx = repmat(m, 1, 200).*Fx;
 
 %ML Momentum
-My = m.*Fy;
+My = repmat(m, 1, 200).*Fy;
 
 %AP sway Center of Pressure
-Copy = Mx./Fz;
+Copy = Mx./repmat(Fz, 1, 200);
 
 %ML sway Center of Pressure
-Copx = My./Fz;
+Copx = My./repmat(Fz, 1, 200);
 
 %%% AVERAGE ACROSS SUBJECTS Anterior and posterior sway RATIO
-A = Copy(Copy>mean(Copy));
-P = Copy(Copy<mean(Copy));
+A_mn = Copy(Copy(:)>mean(Copy(:))); A_mn=mean(A_mn);
+P_mn = Copy(Copy(:)<mean(Copy(:)));P_mn=mean(P_mn);
 
 %%% AVERAGE ACROSS SUBJECTS Rightward and leftward sway RATIO
-R = Copx(Copx>mean(Copx));
-L = Copx(Copx<mean(Copx));
+R_mn = Copx(Copx(:)>mean(Copx(:)));R_mn=mean(R_mn);
+L_mn = Copx(Copx(:)<mean(Copx(:)));L_mn=mean(L_mn);
 
-APRAT = mean(A)/mean(P);
-RLRAT = mean(R)/mean(L);
+APRAT = A_mn/P_mn;
+RLRAT = R_mn/L_mn;
 
 % COP per subject figure
 %plot data
-scatter(mean(Copy),mean(Copx)); hold
+scatter(mean(Copy, 2),mean(Copx, 2)); hold
 %create a bestfit line
 line = lsline;
 axis equal
